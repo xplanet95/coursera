@@ -8,11 +8,31 @@ import re
 def parse(path_to_file):
     with open(path_to_file, 'r', encoding='utf-8') as html:
         soup = bs(html, 'lxml')
-        imgs = len(soup.find_all('img',  width=lambda x: int(x or 0) > 199))
-        pattern = re.compile(r'[hH1-6]{2}')
-        headers = len([i.text for i in soup.find_all(name=pattern) if i.text[0] in 'ETC']) - 1
+        body = soup.find(id="bodyContent")
 
-    # return [imgs, headers, linkslen, lists]
+        imgs = len(body.find_all('img',  width=lambda x: int(x or 0) > 199))
+        pattern = re.compile(r'[hH1-6]{2}')
+        headers = len([i.text for i in body.find_all(name=pattern) if i.text[0] in 'ETC'])
+
+        linkslen = 0
+        link_found = body.find_next('a')
+        while link_found:
+            local_linklen = 1
+            for i in link_found.find_next_siblings():
+                if i.name == 'a':
+                    local_linklen += 1
+                else:
+                    break
+            linkslen = max(linkslen, local_linklen)
+            link_found = link_found.find_next('a')
+
+        lists = 0
+        html_lists = body.find_all(['ul', 'ol'])
+        for html_list in html_lists:
+            if not html_list.find_parents(['ul', 'ol']):
+                lists += 1
+    print([imgs, headers, linkslen, lists])
+    return [imgs, headers, linkslen, lists]
 
 
 class TestParse(unittest.TestCase):
