@@ -14,17 +14,15 @@ def parse(path_to_file):
         pattern = re.compile(r'[hH1-6]{2}')
         headers = len([i.text for i in body.find_all(name=pattern) if i.text[0] in 'ETC'])
 
+        all_links = body.find_all('a')
         linkslen = 0
-        link_found = body.find_next('a')
-        while link_found:
-            local_linklen = 1
-            for i in link_found.find_next_siblings():
-                if i.name == 'a':
-                    local_linklen += 1
-                else:
+        for link in all_links:
+            local_linkslen = 1
+            for i in link.find_next_siblings():
+                if i.name != 'a':
                     break
-            linkslen = max(linkslen, local_linklen)
-            link_found = link_found.find_next('a')
+                local_linkslen += 1
+            linkslen = max(linkslen, local_linkslen)
 
         lists = 0
         html_lists = body.find_all(['ul', 'ol'])
