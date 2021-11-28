@@ -9,3 +9,11 @@ if result == correct:
     print("Correct")
 else:
     print("Incorrect: %s != %s" % (result, correct))
+
+
+correct = Decimal('92628.4452')
+result = convert(Decimal("1000.1000"), 'ZAR', 'KRW', "26/02/2018", requests)
+if result == correct:
+    print("Correct")
+else:
+    print("Incorrect: %s != %s" % (result, correct))
